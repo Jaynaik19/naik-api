@@ -1,0 +1,27 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+python-dotenv = "*"
+requests = "*"
+typing-extensions = "*"
+typing = "*"
+fastapi = "*"
+uvicorn = "*"
+aiohttp = "*"
+asyncio = "*"
+pandas = "*"
+aiometer = "*"
+nest-asyncio = "*"
+
+[dev-packages]
+pipenv = "*"
+black = "*"
+pyright = "*"
+pydocstyle = "*"
+pytest = "*"
+
+[requires]
+python_version = "3.12"
