@@ -1,0 +1,51 @@
+WITH
+
+  all_trades AS (
+    SELECT
+      s.BLOCK_TIMESTAMP as time,
+      CAST(SUM((ABS(s.amount0_usd) + ABS(s.amount1_usd))) AS DOUBLE) AS amount_usd,
+      p.FEE_PERCENT AS fee_tier,--Converting fee tier to a multiplier (i.e. for 0.3%, 3000 -> 0.003) 
+      SUM((ABS(s.amount0_usd) + ABS(s.amount1_usd))/2) * p.fee_percent / 100 AS fee_collected --USD Amount * %fee = fees collected 
+    FROM
+     ethereum.uniswapv3.ez_swaps AS s
+      LEFT JOIN ethereum.uniswapv3.ez_pools AS p ON s.POOL_ADDRESS = p.POOL_ADDRESS
+    GROUP BY 1, 3
+  ),
+
+  last_1_year as (
+  
+  SELECT (SELECT year(time) From all_trades WHERE time > DATEADD(year,-1,GETDATE()) ORDER BY time ASC LIMIT 1) as time,
+
+         SUM(trades.amount_usd) as volume,
+         SUM(trades.fee_collected) fees_collected
+         
+  FROM all_trades trades
+  WHERE 
+        trades.time >= date_trunc('year', current_date - interval '1 year') AND-- start date 
+        trades.time <= date_trunc('year', current_date) - interval '1 day' -- end date 
+
+  ),
+
+  last_2_year as (
+  
+  SELECT (SELECT year(time) From all_trades WHERE time > DATEADD(year,-2,GETDATE()) ORDER BY time ASC LIMIT 1) as time,
+
+         SUM(trades.amount_usd) as volume,
+         SUM(trades.fee_collected) as fees_collected
+         
+  FROM all_trades trades
+  WHERE 
+        trades.time >= date_trunc('year', current_date - interval '2 year') AND-- start date 
+        trades.time <= date_trunc('year', current_date - interval '1 year') - interval '1 day' -- end date 
+
+  ),
+  
+combine as (
+SELECT time, volume, fees_collected FROM last_1_year
+UNION
+SELECT time, volume, fees_collected FROM last_2_year
+)
+
+
+
+SELECT * FROM combine

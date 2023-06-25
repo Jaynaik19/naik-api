@@ -1,0 +1,61 @@
+import pyodbc
+from jinja2 import Template
+
+# Set up the database connection
+conn_str = 'Driver={SQL Server};Server=your_server_name;Database=your_database_name;Trusted_Connection=yes;'
+conn = pyodbc.connect(conn_str)
+cursor = conn.cursor()
+
+# Define SQL query template using Jinja syntax
+sql_template = """
+WITH all_trades AS (
+  SELECT
+    p.pool_name,
+    p.fee_percent,
+    SUM((ABS(amount0_usd) + ABS(amount1_usd))/2) * p.fee_percent / 100 as fees_collected,
+    RANK() OVER(ORDER BY fees_collected DESC) as rank
+  FROM ethereum.uniswapv3.ez_swaps s
+  JOIN ethereum.uniswapv3.ez_pools p
+    ON s.pool_address = p.pool_address
+  GROUP BY 1, 2
+),
+fee_by_volume AS (
+  SELECT 
+    CASE 
+      WHEN fee_percent = 1 THEN '1'
+      WHEN fee_percent = 0.05 THEN '0.05'
+      WHEN fee_percent = 0.3 THEN '0.3'
+      WHEN fee_percent = 0.01 THEN '0.01'
+      ELSE 'Others'
+    END as fee_percent,
+    SUM(fees_collected) as Volume 
+  FROM all_trades 
+  GROUP BY 1
+  ORDER BY 1 DESC
+)
+{{ sql_query }}
+"""
+
+# Create a Jinja template object
+template = Template(sql_template)
+
+# Provide any additional template variables if required
+template_vars = {
+    'sql_query': 'SELECT * FROM fee_by_volume'
+}
+
+# Render the Jinja template by passing the template variables
+rendered_sql = template.render(template_vars)
+
+# Execute the SQL query
+cursor.execute(rendered_sql)
+
+# Fetch and process the query results
+results = cursor.fetchall()
+for row in results:
+    # Process each row of the result
+    print(row)
+
+# Close the database connection
+cursor.close()
+conn.close()
