@@ -12,9 +12,11 @@ fastapi = "*"
 uvicorn = "*"
 aiohttp = "*"
 asyncio = "*"
+numpy = "*"
 pandas = "*"
 aiometer = "*"
 nest-asyncio = "*"
+pre-commit = "*"
 
 [dev-packages]
 pipenv = "*"
@@ -24,4 +26,4 @@ pydocstyle = "*"
 pytest = "*"
 
 [requires]
-python_version = "3.12"
+python_version = "3.10.4"
