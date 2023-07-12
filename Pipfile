@@ -17,6 +17,7 @@ pandas = "*"
 aiometer = "*"
 nest-asyncio = "*"
 pre-commit = "*"
+mypy = "*"
 
 [dev-packages]
 pipenv = "*"

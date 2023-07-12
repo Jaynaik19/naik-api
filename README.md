@@ -4,9 +4,12 @@ The project intends to be a data aggregator layer focusingon crypto.
 
 ## Project
 
-- Data Piplines
-- Data aggragtions
-- Daata cleanup
+Create an host an API that does
+
+- [ ] Portfolio Mangement based on inputs
+- [ ] Yeild analysis
+  - [ ] Imparament calculation
+  - [ ]
 
 ### Task
 
@@ -14,3 +17,8 @@ The project intends to be a data aggregator layer focusingon crypto.
 - [ ] [Using Mako for templating](https://www.makotemplates.org/)
 - [ ] [Load balancing and proxy setup](https://testdriven.io/blog/fastapi-docker-traefik/)
 - [ ]
+
+### Integrations
+
+- [ ] defilamma
+- [ ] CoinGecko
